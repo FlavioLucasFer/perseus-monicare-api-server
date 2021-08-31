@@ -13,7 +13,7 @@ const app = express();
 // Configuration
 	// Session
 app.use(session({
-	secret: 'snb-blog',
+	secret: 'prs-mcr',
 	resave: true,
 	saveUninitialized: true,
 }));

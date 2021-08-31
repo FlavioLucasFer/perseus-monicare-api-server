@@ -15,7 +15,7 @@ const USER_ROUTES = {
 	find: '/find',
 	findAll: '/find-all',
 	findById: '/find-by-id',
-	findOne: '/find-one'
+	findOne: '/find-one',
 };
 
 const router = Router();

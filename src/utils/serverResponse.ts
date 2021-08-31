@@ -22,5 +22,5 @@ function errorResponse(status: number, message: string, error: string | object) 
 
 export {
 	successResponse,
-	errorResponse
+	errorResponse,
 };
