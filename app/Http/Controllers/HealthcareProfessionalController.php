@@ -111,10 +111,20 @@ class HealthcareProfessionalController extends Controller
      * @param  \App\Models\HealthcareProfessional  $healthcareProfessional
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, HealthcareProfessional $healthcareProfessional)
+    public function update(Request $request, int $id)
     {
 			try {
 				DB::beginTransaction();
+
+				$healthcareProfessional = HealthcareProfessional::has('user')->find($id);
+
+				if (!$healthcareProfessional) {
+					return $this->failureResponse(
+						404, 
+						'Healthcare professinal not found',
+						'Healthcare professinal not found',
+					);
+				}
 
 				$healthcareProfessional->user->name = $request->name;
 				$healthcareProfessional->user->login = $request->login;
