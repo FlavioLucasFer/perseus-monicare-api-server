@@ -14,13 +14,18 @@ class CreateUsersTable extends Migration
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
+					$table->bigIncrements('id');
+					$table->string('name', 150);
+					$table->string('login', 50)->unique();
+					$table->string('password');
+					$table->char('cpf', 14)->unique();
+					$table->char('phone', 15);
+					$table->char('type', 2)
+						->comment('AD = Admin | PT = Patient | DC = Doctor | CG = Caregiver | HP = Healthcare Professional');
+					$table->enum('status', ['A', 'I'])->default('A')
+						->comment('A = Active | I = Inactive');
+					$table->rememberToken();
+					$table->timestamps();
         });
     }
 
