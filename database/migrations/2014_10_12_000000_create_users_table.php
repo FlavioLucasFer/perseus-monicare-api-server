@@ -22,10 +22,9 @@ class CreateUsersTable extends Migration
 					$table->char('phone', 15);
 					$table->char('type', 2)
 						->comment('AD = Admin | PT = Patient | DC = Doctor | CG = Caregiver | HP = Healthcare Professional');
-					$table->enum('status', ['A', 'I'])->default('A')
-						->comment('A = Active | I = Inactive');
 					$table->rememberToken();
 					$table->timestamps();
+					$table->softDeletes();
         });
     }
 

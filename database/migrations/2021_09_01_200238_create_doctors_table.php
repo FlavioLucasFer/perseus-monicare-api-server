@@ -18,7 +18,7 @@ class CreateDoctorsTable extends Migration
 						$table->string('crm', 13)->unique();
 						$table->string('specialty', 50);
 						$table->string('email');
-						$table->foreign('id')->references('id')->on('users')->onDelete('CASCADE');
+						$table->foreign('id')->references('id')->on('users');
         });
     }
 

@@ -16,7 +16,7 @@ class CreateHealthcareProfessionalsTable extends Migration
         Schema::create('healthcare_professionals', function (Blueprint $table) {
 					$table->unsignedBigInteger('id')->primary();
 					$table->string('email');
-					$table->foreign('id')->references('id')->on('users')->onDelete('CASCADE');
+					$table->foreign('id')->references('id')->on('users');
         });
     }
 

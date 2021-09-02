@@ -19,7 +19,7 @@ class CreateCaregiversTable extends Migration
 					$table->integer('age');
 					$table->char('kinship', 2)->comment('MT = Mother | FT = Father | CT = Custodian');
 					$table->string('email')->nullable();
-					$table->foreign('id')->references('id')->on('users')->onDelete('CASCADE');
+					$table->foreign('id')->references('id')->on('users');
 					$table->foreign('patient_id')->references('id')->on('patients');
         });
     }

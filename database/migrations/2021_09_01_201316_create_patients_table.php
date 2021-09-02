@@ -17,7 +17,7 @@ class CreatePatientsTable extends Migration
 					$table->unsignedBigInteger('id')->primary();
 					$table->integer('age');
 					$table->string('email')->nullable();
-					$table->foreign('id')->references('id')->on('users')->onDelete('CASCADE');
+					$table->foreign('id')->references('id')->on('users');
         });
     }
 
