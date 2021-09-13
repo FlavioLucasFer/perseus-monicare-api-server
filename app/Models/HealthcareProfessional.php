@@ -14,7 +14,6 @@ class HealthcareProfessional extends Model
 
 	public function setEmailAttribute($value) 
 	{
-		
 		if ($value) {
 			if (filter_var($value, FILTER_VALIDATE_EMAIL))
 				$this->attributes['email'] = $value;
