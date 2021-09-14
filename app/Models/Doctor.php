@@ -11,6 +11,18 @@ class Doctor extends Model
 
 	public $timestamps = false;
 
+	public function setCrmAttribute($value)
+	{
+		if ($value)
+			$this->attributes['crm'] = $value;
+	}
+
+	public function setSpecialtyAttribute($value)
+	{
+		if ($value)
+			$this->attributes['specialty'] = $value;
+	}
+
 	public function setEmailAttribute($value)
 	{
 
