@@ -37,8 +37,8 @@ class HealthcareProfessional extends Model
 			'phone' => $this->user->phone,
 			'email' => $this->attributes['email'],
 			'type' => $this->user->type,
-			'created_at' => $this->user->created_at,
-			'updated_at' => $this->user->updated_at,
+			'createdAt' => $this->user->createdAt,
+			'updatedAt' => $this->user->updatedAt,
 		];
 	}
 }

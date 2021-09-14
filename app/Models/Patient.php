@@ -5,22 +5,26 @@ namespace App\Models;
 use App\Exceptions\CustomExceptions;
 use Illuminate\Database\Eloquent\Model;
 
-class Doctor extends Model
+class Patient extends Model
 {
-  protected $table = 'doctors';
+	protected $table = 'patient';
 
 	public $timestamps = false;
 
-	public function setCrmAttribute($value)
-	{
-		if ($value)
-			$this->attributes['crm'] = $value;
-	}
+	protected $maps = [
+		'birth_date' => 'birthDate',
+	];
 
-	public function setSpecialtyAttribute($value)
-	{
-		if ($value)
-			$this->attributes['specialty'] = $value;
+	protected $append = [
+		'birthDate',
+	];
+
+	protected $hidden = [
+		'birth_date',
+	];
+
+	public function getBirthDateAttribute() {
+		return $this->attributes['birth_date'];
 	}
 
 	public function setEmailAttribute($value)
@@ -47,8 +51,7 @@ class Doctor extends Model
 			'login' => $this->user->login,
 			'cpf' => $this->user->cpf,
 			'phone' => $this->user->phone,
-			'crm' => $this->attributes['crm'],
-			'specialty' => $this->attributes['specialty'],
+			'birthDate' => $this->getBirthDateAttribute(),
 			'email' => $this->attributes['email'],
 			'type' => $this->user->type,
 			'createdAt' => $this->user->createdAt,
