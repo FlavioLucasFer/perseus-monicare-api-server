@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreDoctorRequest;
+use App\Http\Requests\UpdateDoctorRequest;
 use App\Models\Doctor;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -24,41 +26,43 @@ class DoctorController extends Controller
 
 			return $this->successResponse($doctors);
 		} catch (\PDOException $e) {
-			return $this->failureResponse(
-				$e->getCode(),
-				$e->errorInfo[2],
-				$e->getMessage(),
-			);
+			return $this->failureResponse($e->getMessage());
 		}	
 	}
 
 	/**
 	 * Store a newly created resource in storage.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \App\Http\Requests\StoreDoctorRequest  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(Request $request)
+	public function store(StoreDoctorRequest $request)
 	{
 		try {
+			$validated = $request->safe()->only([
+				'name', 'login', 'password',
+				'cpf', 'phone', 'crm',
+				'specialty', 'email',
+			]);
+
 			DB::beginTransaction();
 
 			$user = new User();
 			$doctor = new Doctor();
 
-			$user->name = $request->name;
-			$user->login = $request->login;
-			$user->password = $request->password;
-			$user->cpf = $request->cpf;
-			$user->phone = $request->phone;
+			$user->name = $validated['name'];
+			$user->login = $validated['login'];
+			$user->password = $validated['password'];
+			$user->cpf = $validated['cpf'];
+			$user->phone = $validated['phone'];
 			$user->type = 'DC';
 
 			$user->save();
 
 			$doctor->id = $user->id;
-			$doctor->crm = $request->crm;
-			$doctor->specialty = $request->specialty;
-			$doctor->email = $request->email;
+			$doctor->crm = $validated['crm'];
+			$doctor->specialty = $validated['specialty'];
+			$doctor->email = $validated['email'];
 
 			$doctor->save();
 
@@ -73,19 +77,11 @@ class DoctorController extends Controller
 		} catch (\PDOException $e) {
 			DB::rollBack();
 
-			return $this->failureResponse(
-				$e->getCode(),
-				$e->errorInfo[2],
-				$e->getMessage(),
-			);
+			return $this->failureResponse($e->getMessage());
 		} catch (\Exception $e) {
 			DB::rollBack();
 
-			return $this->failureResponse(
-				$e->getCode(),
-				$e->getMessage(),
-				$e->getMessage(),
-			);
+			return $this->failureResponse($e->getMessage());
 		}
 	}
 
@@ -105,38 +101,56 @@ class DoctorController extends Controller
 
 			return $this->successResponse($doctor);
 		} catch (\PDOException $e) {
-			return $this->failureResponse(
-				$e->getCode(),
-				$e->errorInfo[2],
-				$e->getMessage(),
-			);
+			return $this->failureResponse($e->getMessage());
 		}
 	}
 
 	/**
 	 * Update the specified resource in storage.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \App\Http\Requests\UpdateDoctorRequest  $request
 	 * @param  int $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function update(Request $request, int $id)
+	public function update(UpdateDoctorRequest $request, int $id)
 	{
 		try {
+			$validated = $request->safe()->only([
+				'name', 'login', 'password',
+				'cpf', 'phone', 'crm',
+				'specialty', 'email',
+			]);
+
 			DB::beginTransaction();
 
 			$doctor = Doctor::has('user')->find($id);
 
 			if (!$doctor) 
-				$this->notFound('Doctor');
+				return $this->notFound('Doctor');
 
-			$doctor->user->name = $request->name;
-			$doctor->user->login = $request->login;
-			$doctor->user->password = $request->password;
-			$doctor->user->cpf = $request->cpf;
-			$doctor->user->phone = $request->phone;
+			if ($this->hasAttribute('name', $validated))
+				$doctor->user->name = $validated['name'];
 
-			$doctor->email = $request->email;
+			if ($this->hasAttribute('login', $validated))
+				$doctor->user->login = $validated['login'];
+
+			if ($this->hasAttribute('password', $validated))
+				$doctor->user->password = $validated['password'];
+
+			if ($this->hasAttribute('cpf', $validated))
+				$doctor->user->cpf = $validated['cpf'];
+
+			if ($this->hasAttribute('phone', $validated))
+				$doctor->user->phone = $validated['phone'];
+			
+			if ($this->hasAttribute('crm', $validated))
+				$doctor->crm = $validated['crm'];
+
+			if ($this->hasAttribute('specialty', $validated))
+				$doctor->specialty = $validated['specialty'];
+
+			if ($this->hasAttribute('email', $validated))
+				$doctor->email = $validated['email'];
 
 			$doctor->push();
 
@@ -146,19 +160,11 @@ class DoctorController extends Controller
 		} catch (\PDOException $e) {
 			DB::rollBack();
 
-			return $this->failureResponse(
-				$e->getCode(),
-				$e->errorInfo[2],
-				$e->getMessage(),
-			);
+			return $this->failureResponse($e->getMessage());
 		} catch (\Exception $e) {
 			DB::rollBack();
 
-			return $this->failureResponse(
-				$e->getCode(),
-				$e->getMessage(),
-				$e->getMessage(),
-			);
+			return $this->failureResponse($e->getMessage());
 		}
 	}
 
@@ -174,7 +180,7 @@ class DoctorController extends Controller
 			$doctor = Doctor::has('user')->find($id);
 
 			if (!$doctor)
-				return $this->notFound('Healthcare professional');
+				return $this->notFound('Doctor');
 
 			DB::beginTransaction();
 
@@ -188,11 +194,7 @@ class DoctorController extends Controller
 		} catch (\PDOException $e) {
 			DB::rollBack();
 
-			return $this->failureResponse(
-				$e->getCode(),
-				$e->errorInfo[2],
-				$e->getMessage(),
-			);
+			return $this->failureResponse($e->getMessage());
 		}
 	}
 }
