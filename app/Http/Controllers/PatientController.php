@@ -26,11 +26,7 @@ class PatientController extends Controller
 
 			return $this->successResponse($patients);
 		} catch (\PDOException $e) {
-			return $this->failureResponse(
-				$e->getCode(),
-				$e->errorInfo[2],
-				$e->getMessage(),
-			);
+			return $this->failureResponse($e->getMessage());
 		}	
 	}
 
@@ -105,11 +101,7 @@ class PatientController extends Controller
 
 			return $this->successResponse($patient);
 		} catch (\PDOException $e) {
-			return $this->failureResponse(
-				$e->getCode(),
-				$e->errorInfo[2],
-				$e->getMessage(),
-			);
+			return $this->failureResponse($e->getMessage());
 		}
 	}
 
@@ -199,11 +191,7 @@ class PatientController extends Controller
 		} catch (\PDOException $e) {
 			DB::rollBack();
 
-			return $this->failureResponse(
-				$e->getCode(),
-				$e->errorInfo[2],
-				$e->getMessage(),
-			);
+			return $this->failureResponse($e->getMessage());
 		}
 	}
 }
