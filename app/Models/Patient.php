@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
-use App\Exceptions\CustomExceptions;
 use Illuminate\Database\Eloquent\Model;
 
 class Patient extends Model
 {
-	protected $table = 'patient';
+	protected $table = 'patients';
 
 	public $timestamps = false;
 
@@ -23,19 +22,29 @@ class Patient extends Model
 		'birth_date',
 	];
 
-	public function getBirthDateAttribute() {
+	public function getBirthDateAttribute() 
+	{
 		return $this->attributes['birth_date'];
+	}
+
+	public function setBirthDateAttribute($value)
+	{
+		if ($value)
+			$this->attributes['birth_date'] = $value;
+	}
+
+	public function getEmailAttribute()
+	{
+		if (array_key_exists('email', $this->attributes))
+			return $this->attributes['email'];
+
+		return null;
 	}
 
 	public function setEmailAttribute($value)
 	{
-
-		if ($value) {
-			if (filter_var($value, FILTER_VALIDATE_EMAIL))
-				$this->attributes['email'] = $value;
-			else
-				CustomExceptions::invalidEmail();
-		}
+		if ($value) 
+			$this->attributes['email'] = $value;
 	}
 
 	public function user()
@@ -52,8 +61,7 @@ class Patient extends Model
 			'cpf' => $this->user->cpf,
 			'phone' => $this->user->phone,
 			'birthDate' => $this->getBirthDateAttribute(),
-			'email' => $this->attributes['email'],
-			'type' => $this->user->type,
+			'email' => $this->getEmailAttribute(),
 			'createdAt' => $this->user->createdAt,
 			'updatedAt' => $this->user->updatedAt,
 		];
