@@ -17,7 +17,7 @@ class Controller extends BaseController
 	 * 
 	 * @return mixed
 	 */
-	protected function statuses() : mixed
+	protected function statuses() 
 	{
 		return json_decode(json_encode([
 			'OK' => 200,
