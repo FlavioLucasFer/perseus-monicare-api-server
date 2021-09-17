@@ -15,6 +15,15 @@ class User extends Model
 
 	protected $dates = ['deleted_at'];
 
+	protected $fillable = [
+		'name',
+		'login',
+		'password',
+		'cpf',
+		'phone',
+		'type',
+	];
+
 	protected $maps = [
 		'created_at' => 'createdAt',
 		'updated_at' => 'updatedAt',
@@ -30,6 +39,16 @@ class User extends Model
 		'remember_token',
 		'created_at',
 		'updated_at',
+		'deleted_at',
+		'type',
+		'id',
+	];
+
+	protected $guarded = [
+		'id',
+		'created_at',
+		'updated_at',
+		'deleted_at',
 	];
 
 	public function getCreatedAtAttribute() 
