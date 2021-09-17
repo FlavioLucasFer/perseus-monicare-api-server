@@ -7,7 +7,6 @@ use App\Http\Requests\UpdateDoctorRequest;
 use App\Models\Doctor;
 use App\Models\User;
 use App\Repositories\DoctorRepository;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DoctorController extends Controller
