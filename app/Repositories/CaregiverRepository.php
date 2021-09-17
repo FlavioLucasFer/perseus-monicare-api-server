@@ -7,7 +7,7 @@ use App\Models\Caregiver;
 /**
  * Class CaregiverRepository.
  */
-class CaregiverRepository
+class CaregiverRepository implements RepositoryTemplate
 {
 	/**
 	 * Finds all caregivers
