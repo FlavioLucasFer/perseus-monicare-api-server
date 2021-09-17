@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CaregiverController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\HealthcareProfessionalController;
 use App\Http\Controllers\PatientController;
@@ -25,3 +26,4 @@ Route::apiResource('users', UserController::class);
 Route::apiResource('healthcare-professionals', HealthcareProfessionalController::class);
 Route::apiResource('doctors', DoctorController::class);
 Route::apiResource('patients', PatientController::class);
+Route::apiResource('caregivers', CaregiverController::class);
