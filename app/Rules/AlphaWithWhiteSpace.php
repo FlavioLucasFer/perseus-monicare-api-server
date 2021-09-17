@@ -15,7 +15,7 @@ class AlphaWithWhiteSpace implements Rule
 	 */
 	public function passes($attribute, $value) : bool
 	{
-		return preg_match('/^[a-zA-Z\s]*$/', $value);
+		return preg_match('/^[a-zA-ZÀ-ú\s]*$/', $value);
 	}
 
 	/**
