@@ -51,7 +51,7 @@ class PatientController extends Controller
 				'password' => $validated['password'],
 				'cpf' => $validated['cpf'],
 				'phone' => $validated['phone'],
-				'type' => 'CG',
+				'type' => 'PT',
 			]);
 
 			Patient::create([
