@@ -54,7 +54,7 @@ class CaregiverController extends Controller
 				'type' => 'CG',
 			]);
 
-			$caregiver = Caregiver::create([
+			Caregiver::create([
 				'id' => $user->id,
 				'birthDate' => $validated['birthDate'],
 				'kinship' => $validated['kinship'],
