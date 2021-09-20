@@ -14,7 +14,7 @@ class CreateMeasurementTypesTable extends Migration
 	public function up()
 	{
 		Schema::create('measurement_types', function (Blueprint $table) {
-			$table->unsignedBigInteger('id')->primary();
+			$table->bigIncrements('id')->primary();
 			$table->string('name', 100)->unique();
 			$table->timestamps();
 			$table->softDeletes();
