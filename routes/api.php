@@ -20,18 +20,28 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+Route::group([
+	'prefix' => 'auth',
+	'namespace' => 'App\Http\Controllers',
+], function () {
+	Route::post('login', 'AuthController@login');
+	Route::post('logout', 'AuthController@logout');
+	Route::post('refresh', 'AuthController@refresh');
+	Route::post('me', 'AuthController@me');
+});
 
-Route::apiResource('users', UserController::class);
-Route::apiResource('healthcare-professionals', HealthcareProfessionalController::class);
-Route::apiResource('doctors', DoctorController::class);
-Route::apiResource('patients', PatientController::class);
-Route::apiResource('caregivers', CaregiverController::class);
-Route::apiResource('measurement-types', MeasurementTypeController::class);
-Route::apiResource(
-	'{measurement_type_id}/patient-measurements/{patient_id}', 
-	PatientMeasurementController::class,
-	['parameters' => ['{patient_id}' => 'patient_measurement_id']]
-);
+Route::group([
+	'middleware' => ['apiJwt'],
+], function () {
+	Route::apiResource('users', UserController::class);
+	Route::apiResource('healthcare-professionals', HealthcareProfessionalController::class);
+	Route::apiResource('doctors', DoctorController::class);
+	Route::apiResource('patients', PatientController::class);
+	Route::apiResource('caregivers', CaregiverController::class);
+	Route::apiResource('measurement-types', MeasurementTypeController::class);
+	Route::apiResource(
+		'{measurement_type_id}/patient-measurements/{patient_id}', 
+		PatientMeasurementController::class,
+		['parameters' => ['{patient_id}' => 'patient_measurement_id']]
+	);
+});
