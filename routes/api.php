@@ -40,7 +40,7 @@ Route::group([
 	Route::apiResource('caregivers', CaregiverController::class);
 	Route::apiResource('measurement-types', MeasurementTypeController::class);
 	Route::apiResource(
-		'{measurement_type_id}/patient-measurements/{patient_id}', 
+		'patient-measurements/{patient_id}', 
 		PatientMeasurementController::class,
 		['parameters' => ['{patient_id}' => 'patient_measurement_id']]
 	);
