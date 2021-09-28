@@ -3,6 +3,7 @@
 use App\Http\Controllers\CaregiverController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\HealthcareProfessionalController;
+use App\Http\Controllers\MeasurementTypeController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -27,3 +28,4 @@ Route::apiResource('healthcare-professionals', HealthcareProfessionalController:
 Route::apiResource('doctors', DoctorController::class);
 Route::apiResource('patients', PatientController::class);
 Route::apiResource('caregivers', CaregiverController::class);
+Route::apiResource('measurement-types', MeasurementTypeController::class);
