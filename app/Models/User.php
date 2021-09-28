@@ -2,43 +2,89 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use App\Exceptions\CustomExceptions;
 
-class User extends Authenticatable
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+
+class User extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable;
+	use SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var string[]
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+	protected $table = 'users';
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+	protected $dates = ['deleted_at'];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+	public function setNameAttribute($value)
+	{
+		if ($value)
+			$this->attributes['name'] = $value;
+	}
+
+	public function setLoginAttribute($value)
+	{
+		if ($value)
+			$this->attributes['login'] = $value;
+	}
+
+	public function setPasswordAttribute($value) 
+	{
+		if ($value)
+			$this->attributes['password'] = Hash::make($value);
+	}
+
+	public function setCpfAttribute($value)
+	{
+		$validator = Validator::make(['cpf' => $value], [
+			'cpf' => 'cpf|formato_cpf',
+		]);
+
+		if ($value) {
+			if (!$validator->fails())
+				$this->attributes['cpf'] = $value;
+			else
+				CustomExceptions::invalidCPF();
+		}
+	}
+
+	public function setPhoneAttribute($value)
+	{
+		$validator = Validator::make(['phone' => $value], ['phone' => 'celular_com_ddd']);
+		
+		if ($value) {
+			if (!$validator->fails())
+				$this->attributes['phone'] = $value;
+			else
+				CustomExceptions::invalidPhone();
+		} 
+	}
+
+	public function setTypeAttribute($value)
+	{
+		if ($value) {
+			if (
+				$value === "AD" ||
+				$value === "PT" ||
+				$value === "DC" ||
+				$value === "CG" ||
+				$value === "HP"
+			) {
+				$this->attributes['type'] = $value;
+			}
+			else
+				CustomExceptions::invalidUserType();
+		}
+	}
+	
+	/**
+	 * The attributes that should be hidden for serialization.
+	 *
+	 * @var array
+	 */
+	protected $hidden = [
+		'password',
+		'remember_token',
+	];
 }
