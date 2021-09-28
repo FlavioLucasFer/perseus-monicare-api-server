@@ -2,29 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreDoctorRequest;
-use App\Http\Requests\UpdateDoctorRequest;
-use App\Models\Doctor;
+use App\Http\Requests\StorePatientRequest;
+use App\Http\Requests\UpdatePatientRequest;
+use App\Models\Patient;
 use App\Models\User;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
-class DoctorController extends Controller
+class PatientController extends Controller
 {
 	/**
 	 * Display a listing of the resource.
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
-	public function index()
+	public function index() : JsonResponse
 	{
 		try {
-			$doctors = Doctor::has('user')->get();
+			$patients = Patient::has('user')->get();
 
-			if (!$doctors)
-				return $this->notFound('Doctors');
+			if (!$patients)
+			return $this->notFound('Patients');
 
-			return $this->successResponse($doctors);
+			return $this->successResponse($patients);
 		} catch (\PDOException $e) {
 			return $this->failureResponse($e->getMessage());
 		}	
@@ -33,45 +33,45 @@ class DoctorController extends Controller
 	/**
 	 * Store a newly created resource in storage.
 	 *
-	 * @param  \App\Http\Requests\StoreDoctorRequest  $request
+	 * @param  app\Http\Resquests\StorePatientRequest  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(StoreDoctorRequest $request)
+	public function store(StorePatientRequest $request) : JsonResponse
 	{
 		try {
 			$validated = $request->safe()->only([
 				'name', 'login', 'password',
-				'cpf', 'phone', 'crm',
-				'specialty', 'email',
+				'cpf', 'phone', 'birthDate',
+				'email',
 			]);
 
 			DB::beginTransaction();
 
 			$user = new User();
-			$doctor = new Doctor();
+			$patient = new Patient();
 
 			$user->name = $validated['name'];
 			$user->login = $validated['login'];
 			$user->password = $validated['password'];
 			$user->cpf = $validated['cpf'];
 			$user->phone = $validated['phone'];
-			$user->type = 'DC';
+			$user->type = 'PT';
 
 			$user->save();
 
-			$doctor->id = $user->id;
-			$doctor->crm = $validated['crm'];
-			$doctor->specialty = $validated['specialty'];
-			$doctor->email = $validated['email'];
+			$patient->id = $user->id;
+			$patient->birthDate = $validated['birthDate'];
 
-			$doctor->save();
+			$patient->email = $validated['email'];
+			
+			$patient->save();
 
-			$doctor->user = $user;
+			$patient->user = $user;
 
 			DB::commit();
 
 			return $this->successResponse(
-				$doctor,
+				$patient,
 				$this->statuses()->CREATED,
 			);
 		} catch (\PDOException $e) {
@@ -91,15 +91,15 @@ class DoctorController extends Controller
 	 * @param  int $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function show(int $id)
+	public function show(int $id) : JsonResponse
 	{
 		try {
-			$doctor = Doctor::has('user')->find($id);
+			$patient = Patient::has('user')->find($id);
 
-			if (!$doctor)
-				return $this->notFound('Doctor');
+			if (!$patient)
+				return $this->notFound('Patient');
 
-			return $this->successResponse($doctor);
+			return $this->successResponse($patient);
 		} catch (\PDOException $e) {
 			return $this->failureResponse($e->getMessage());
 		}
@@ -108,55 +108,52 @@ class DoctorController extends Controller
 	/**
 	 * Update the specified resource in storage.
 	 *
-	 * @param  \App\Http\Requests\UpdateDoctorRequest  $request
+	 * @param  app\Http\Resquests\UpdatePatientRequest  $request
 	 * @param  int $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function update(UpdateDoctorRequest $request, int $id)
+	public function update(UpdatePatientRequest $request, int $id) : JsonResponse
 	{
 		try {
 			$validated = $request->safe()->only([
 				'name', 'login', 'password',
-				'cpf', 'phone', 'crm',
-				'specialty', 'email',
+				'cpf', 'phone', 'birthDate',
+				'email',
 			]);
 
 			DB::beginTransaction();
 
-			$doctor = Doctor::has('user')->find($id);
+			$patient = Patient::has('user')->find($id);
 
-			if (!$doctor) 
-				return $this->notFound('Doctor');
+			if (!$patient)
+				return $this->notFound('Patient');
 
 			if ($this->hasAttribute('name', $validated))
-				$doctor->user->name = $validated['name'];
+				$patient->user->name = $validated['name'];
 
 			if ($this->hasAttribute('login', $validated))
-				$doctor->user->login = $validated['login'];
+				$patient->user->login = $validated['login'];
 
 			if ($this->hasAttribute('password', $validated))
-				$doctor->user->password = $validated['password'];
+				$patient->user->password = $validated['password'];
 
 			if ($this->hasAttribute('cpf', $validated))
-				$doctor->user->cpf = $validated['cpf'];
+				$patient->user->cpf = $validated['cpf'];
 
 			if ($this->hasAttribute('phone', $validated))
-				$doctor->user->phone = $validated['phone'];
+				$patient->user->phone = $validated['phone'];
 			
-			if ($this->hasAttribute('crm', $validated))
-				$doctor->crm = $validated['crm'];
-
-			if ($this->hasAttribute('specialty', $validated))
-				$doctor->specialty = $validated['specialty'];
+			if ($this->hasAttribute('birthDate', $validated))
+				$patient->birthDate = $validated['birthDate'];
 
 			if ($this->hasAttribute('email', $validated))
-				$doctor->email = $validated['email'];
+				$patient->email = $validated['email'];
 
-			$doctor->push();
+			$patient->push();
 
 			DB::commit();
 
-			return $this->successResponse($doctor);
+			return $this->successResponse($patient);
 		} catch (\PDOException $e) {
 			DB::rollBack();
 
@@ -174,19 +171,19 @@ class DoctorController extends Controller
 	 * @param  int $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function destroy(int $id)
+	public function destroy(int $id) : JsonResponse
 	{
 		try {
-			$doctor = Doctor::has('user')->find($id);
+			$patient = Patient::has('user')->find($id);
 
-			if (!$doctor)
-				return $this->notFound('Doctor');
+			if (!$patient)
+				return $this->notFound('Patient');
 
 			DB::beginTransaction();
 
-			$doctor->user->delete();
+			$patient->user->delete();
 
-			$doctor->push();
+			$patient->push();
 
 			DB::commit();
 

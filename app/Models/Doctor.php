@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Exceptions\CustomExceptions;
 use Illuminate\Database\Eloquent\Model;
 
 class Doctor extends Model
@@ -25,13 +24,8 @@ class Doctor extends Model
 
 	public function setEmailAttribute($value)
 	{
-
-		if ($value) {
-			if (filter_var($value, FILTER_VALIDATE_EMAIL))
-				$this->attributes['email'] = $value;
-			else
-				CustomExceptions::invalidEmail();
-		}
+		if ($value)
+			$this->attributes['email'] = $value;
 	}
 
 	public function user()
@@ -50,7 +44,6 @@ class Doctor extends Model
 			'crm' => $this->attributes['crm'],
 			'specialty' => $this->attributes['specialty'],
 			'email' => $this->attributes['email'],
-			'type' => $this->user->type,
 			'createdAt' => $this->user->createdAt,
 			'updatedAt' => $this->user->updatedAt,
 		];

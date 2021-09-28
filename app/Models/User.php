@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-use App\Exceptions\CustomExceptions;
-
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 
 class User extends Model
 {
@@ -34,11 +32,13 @@ class User extends Model
 		'updated_at',
 	];
 
-	public function getCreatedAtAttribute() {
+	public function getCreatedAtAttribute() 
+	{
 		return $this->attributes['created_at'];
 	}
 
-	public function getUpdatedAtAttribute() {
+	public function getUpdatedAtAttribute() 
+	{
 		return $this->attributes['updated_at'];
 	}
 
@@ -62,28 +62,14 @@ class User extends Model
 
 	public function setCpfAttribute($value)
 	{
-		$validator = Validator::make(['cpf' => $value], [
-			'cpf' => 'cpf|formato_cpf',
-		]);
-
-		if ($value) {
-			if (!$validator->fails())
-				$this->attributes['cpf'] = $value;
-			else
-				CustomExceptions::invalidCPF();
-		}
+		if ($value)
+			$this->attributes['cpf'] = $value;
 	}
 
 	public function setPhoneAttribute($value)
-	{
-		$validator = Validator::make(['phone' => $value], ['phone' => 'celular_com_ddd']);
-		
-		if ($value) {
-			if (!$validator->fails())
-				$this->attributes['phone'] = $value;
-			else
-				CustomExceptions::invalidPhone();
-		} 
+	{	
+		if ($value) 
+			$this->attributes['phone'] = $value;
 	}
 
 	public function setTypeAttribute($value)
@@ -99,7 +85,7 @@ class User extends Model
 				$this->attributes['type'] = $value;
 			}
 			else
-				CustomExceptions::invalidUserType();
+				throw new Exception('Invalid user type');
 		}
 	}
 }
