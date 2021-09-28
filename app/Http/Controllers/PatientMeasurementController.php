@@ -19,10 +19,10 @@ class PatientMeasurementController extends Controller
 	 * @param  int $patientId 
 	 * @return \Illuminate\Http\Response
 	 */
-	public function index(QueryPatientMeasurementRequest $request, $measurementTypeId, $patientId) : JsonResponse
+	public function index(QueryPatientMeasurementRequest $request, $patientId) : JsonResponse
 	{
 		try {
-			$patientMeasurements = PatientMeasurementRepository::find($measurementTypeId, $patientId);
+			$patientMeasurements = PatientMeasurementRepository::find($patientId);
 
 			return $this->successResponse($patientMeasurements);
 		} catch (\PDOException $e) {
@@ -36,22 +36,23 @@ class PatientMeasurementController extends Controller
 	 * @param  \App\Http\Requests\StorePatientMeasurementRequest $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(StorePatientMeasurementRequest $request, $measurementTypeId, $patientId) : JsonResponse
+	public function store(StorePatientMeasurementRequest $request, $patientId) : JsonResponse
 	{
 		try {
 			$validated = $request->safe()->only([
 				'value',
 				'measuredAt',
+				'measurementTypeId',
 			]);
 
 			$patientMeasurement = PatientMeasurement::create([
 				'value' => $validated['value'],
 				'measuredAt' => $validated['measuredAt'],
-				'measurementTypeId' => $measurementTypeId,
+				'measurementTypeId' => $validated['measurementTypeId'],
 				'patientId' => $patientId,
 			]);
 
-			$patientMeasurement = PatientMeasurementRepository::findById($patientMeasurement->id);
+			$patientMeasurement = PatientMeasurementRepository::findById($patientId, $patientMeasurement->id);
 
 			return $this->successResponse($patientMeasurement, $this->statuses()->CREATED);
 		} catch (\PDOException $e) {
@@ -63,15 +64,14 @@ class PatientMeasurementController extends Controller
 	 * Display the specified resource.
 	 *
 	 * @param  \App\Http\Requests\QueryPatientMeasurementRequest $request
-	 * @param  int $measurementTypeId 
 	 * @param  int $patientId 
 	 * @param  int $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function show(QueryPatientMeasurementRequest $request, $measurementTypeId, $patientId, int $id) : JsonResponse
+	public function show(QueryPatientMeasurementRequest $request, $patientId, int $id) : JsonResponse
 	{
 		try {
-			$patientMeasurement = PatientMeasurementRepository::findById($id);
+			$patientMeasurement = PatientMeasurementRepository::findById($patientId, $id);
 
 			return $this->successResponse($patientMeasurement);
 		} catch (\PDOException $e) {
@@ -83,17 +83,19 @@ class PatientMeasurementController extends Controller
 	 * Update the specified resource in storage.
 	 *
 	 * @param  \App\Http\Requests\QueryPatientMeasurementRequest $request
-	 * @param  int $measurementTypeId 
 	 * @param  int $patientId 
 	 * @param  int $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function update(UpdatePatientMeasurementRequest $request, $measurementTypeId, $patientId, int $id) : JsonResponse
+	public function update(UpdatePatientMeasurementRequest $request, $patientId, int $id) : JsonResponse
 	{
 		try {
-			$validated = $request->safe()->only(['value']);
+			$validated = $request->safe()->only([
+				'value',
+				'measurementTypeId',
+			]);
 
-			$patientMeasurement = PatientMeasurementRepository::findById($id);
+			$patientMeasurement = PatientMeasurementRepository::findById($patientId, $id);
 
 			if (!$patientMeasurement)
 				return $this->notFound('Patient measurement');
@@ -101,7 +103,12 @@ class PatientMeasurementController extends Controller
 			if ($this->hasAttribute('value', $validated))
 				$patientMeasurement->value = $validated['value'];
 
+			if ($this->hasAttribute('measurementTypeId', $validated))
+				$patientMeasurement->measurementTypeId = $validated['measurementTypeId'];
+
 			$patientMeasurement->save();
+
+			$patientMeasurement = PatientMeasurementRepository::findById($patientId, $id);
 
 			return $this->successResponse($patientMeasurement);
 		} catch (\PDOException $e) {
@@ -113,15 +120,14 @@ class PatientMeasurementController extends Controller
 	 * Remove the specified resource from storage.
 	 *
 	 * @param  \App\Http\Requests\QueryPatientMeasurementRequest $request
-	 * @param  int $measurementTypeId 
 	 * @param  int $patientId 
 	 * @param  int $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function destroy(QueryPatientMeasurementRequest $request, $measurementTypeId, $patientId, int $id) : JsonResponse
+	public function destroy(QueryPatientMeasurementRequest $request, $patientId, int $id) : JsonResponse
 	{
 		try {
-			$patientMeasurement = PatientMeasurementRepository::findById($id);
+			$patientMeasurement = PatientMeasurementRepository::findById($patientId, $id);
 
 			if (!$patientMeasurement)
 				return $this->notFound('Patient measurement');

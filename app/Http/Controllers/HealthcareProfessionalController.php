@@ -49,7 +49,7 @@ class HealthcareProfessionalController extends Controller
 				'password' => $validated['password'],
 				'cpf' => $validated['cpf'],
 				'phone' => $validated['phone'],
-				'type' => 'DC',
+				'type' => 'HP',
 			]);
 
 			HealthcareProfessional::create([
