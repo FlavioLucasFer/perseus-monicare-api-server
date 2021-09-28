@@ -6,6 +6,7 @@ use App\Http\Requests\StoreMeasurementTypeRequest;
 use App\Http\Requests\UpdateMeasurementTypeRequest;
 use App\Models\MeasurementType;
 use App\Repositories\MeasurementTypeRepository;
+use Illuminate\Http\JsonResponse;
 
 class MeasurementTypeController extends Controller
 {
@@ -14,14 +15,14 @@ class MeasurementTypeController extends Controller
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
-	public function index()
+	public function index() : JsonResponse
 	{
 		try {
 			$measurementTypes = MeasurementTypeRepository::find();
 
 			return $this->successResponse($measurementTypes);
 		} catch (\PDOException $e) {
-			$this->failureResponse($e->getMessage());
+			return $this->failureResponse($e->getMessage());
 		}
 	}
 
@@ -31,7 +32,7 @@ class MeasurementTypeController extends Controller
 	 * @param  \App\Http\Requests\StoreMeasurementTypeRequest  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(StoreMeasurementTypeRequest $request)
+	public function store(StoreMeasurementTypeRequest $request) : JsonResponse
 	{
 		try {
 			$validated = $request->safe()->only(['name']);
@@ -52,7 +53,7 @@ class MeasurementTypeController extends Controller
 	 * @param  int $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function show(int $id)
+	public function show(int $id) : JsonResponse
 	{
 		try {
 			$measurementType = MeasurementTypeRepository::findById($id);
@@ -70,7 +71,7 @@ class MeasurementTypeController extends Controller
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function update(UpdateMeasurementTypeRequest $request, int $id)
+	public function update(UpdateMeasurementTypeRequest $request, int $id) : JsonResponse
 	{
 		try {
 			$measurementType = MeasurementTypeRepository::findById($id);
@@ -97,7 +98,7 @@ class MeasurementTypeController extends Controller
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function destroy(int $id)
+	public function destroy(int $id) : JsonResponse
 	{
 		try {
 			$measurementType = MeasurementTypeRepository::findById($id);
