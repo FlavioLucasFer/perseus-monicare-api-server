@@ -17,6 +17,31 @@ class User extends Model
 
 	protected $dates = ['deleted_at'];
 
+	protected $maps = [
+		'created_at' => 'createdAt',
+		'updated_at' => 'updatedAt',
+	];
+
+	protected $append = [
+		'createdAt',
+		'updatedAt',
+	];
+
+	protected $hidden = [
+		'password',
+		'remember_token',
+		'created_at',
+		'updated_at',
+	];
+
+	public function getCreatedAtAttribute() {
+		return $this->attributes['created_at'];
+	}
+
+	public function getUpdatedAtAttribute() {
+		return $this->attributes['updated_at'];
+	}
+
 	public function setNameAttribute($value)
 	{
 		if ($value)
@@ -77,14 +102,4 @@ class User extends Model
 				CustomExceptions::invalidUserType();
 		}
 	}
-	
-	/**
-	 * The attributes that should be hidden for serialization.
-	 *
-	 * @var array
-	 */
-	protected $hidden = [
-		'password',
-		'remember_token',
-	];
 }

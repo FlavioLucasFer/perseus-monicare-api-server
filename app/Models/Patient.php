@@ -3,22 +3,38 @@
 namespace App\Models;
 
 use App\Exceptions\CustomExceptions;
-
 use Illuminate\Database\Eloquent\Model;
 
-class HealthcareProfessional extends Model
+class Patient extends Model
 {
-  protected $table = 'healthcare_professionals';
+	protected $table = 'patient';
 
 	public $timestamps = false;
 
-	public function setEmailAttribute($value) 
+	protected $maps = [
+		'birth_date' => 'birthDate',
+	];
+
+	protected $append = [
+		'birthDate',
+	];
+
+	protected $hidden = [
+		'birth_date',
+	];
+
+	public function getBirthDateAttribute() {
+		return $this->attributes['birth_date'];
+	}
+
+	public function setEmailAttribute($value)
 	{
+
 		if ($value) {
 			if (filter_var($value, FILTER_VALIDATE_EMAIL))
 				$this->attributes['email'] = $value;
 			else
-				CustomExceptions::invalidEmail();			
+				CustomExceptions::invalidEmail();
 		}
 	}
 
@@ -35,6 +51,7 @@ class HealthcareProfessional extends Model
 			'login' => $this->user->login,
 			'cpf' => $this->user->cpf,
 			'phone' => $this->user->phone,
+			'birthDate' => $this->getBirthDateAttribute(),
 			'email' => $this->attributes['email'],
 			'type' => $this->user->type,
 			'createdAt' => $this->user->createdAt,
