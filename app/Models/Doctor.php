@@ -10,6 +10,13 @@ class Doctor extends Model
 
 	public $timestamps = false;
 
+	protected $fillable = [
+		'id',
+		'crm',
+		'specialty',
+		'email',
+	];
+
 	public function setCrmAttribute($value)
 	{
 		if ($value)
@@ -30,22 +37,6 @@ class Doctor extends Model
 
 	public function user()
 	{
-		return $this->belongsTo(User::class, 'id', 'id');
-	}
-
-	public function toArray()
-	{
-		return [
-			'id' => $this->user->id,
-			'name' => $this->user->name,
-			'login' => $this->user->login,
-			'cpf' => $this->user->cpf,
-			'phone' => $this->user->phone,
-			'crm' => $this->attributes['crm'],
-			'specialty' => $this->attributes['specialty'],
-			'email' => $this->attributes['email'],
-			'createdAt' => $this->user->createdAt,
-			'updatedAt' => $this->user->updatedAt,
-		];
+		return $this->hasOne(User::class, 'id', 'id');
 	}
 }

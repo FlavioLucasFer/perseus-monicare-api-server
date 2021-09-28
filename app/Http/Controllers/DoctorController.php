@@ -6,7 +6,7 @@ use App\Http\Requests\StoreDoctorRequest;
 use App\Http\Requests\UpdateDoctorRequest;
 use App\Models\Doctor;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Repositories\DoctorRepository;
 use Illuminate\Support\Facades\DB;
 
 class DoctorController extends Controller
@@ -19,10 +19,7 @@ class DoctorController extends Controller
 	public function index()
 	{
 		try {
-			$doctors = Doctor::has('user')->get();
-
-			if (!$doctors)
-				return $this->notFound('Doctors');
+			$doctors = DoctorRepository::find();
 
 			return $this->successResponse($doctors);
 		} catch (\PDOException $e) {
@@ -47,28 +44,25 @@ class DoctorController extends Controller
 
 			DB::beginTransaction();
 
-			$user = new User();
-			$doctor = new Doctor();
+			$user = User::create([
+				'name' => $validated['name'],
+				'login' => $validated['login'],
+				'password' => $validated['password'],
+				'cpf' => $validated['cpf'],
+				'phone' => $validated['phone'],
+				'type' => 'DC',
+			]);
 
-			$user->name = $validated['name'];
-			$user->login = $validated['login'];
-			$user->password = $validated['password'];
-			$user->cpf = $validated['cpf'];
-			$user->phone = $validated['phone'];
-			$user->type = 'DC';
-
-			$user->save();
-
-			$doctor->id = $user->id;
-			$doctor->crm = $validated['crm'];
-			$doctor->specialty = $validated['specialty'];
-			$doctor->email = $validated['email'];
-
-			$doctor->save();
-
-			$doctor->user = $user;
+			Doctor::create([
+				'id' => $user->id,
+				'crm' => $validated['crm'],
+				'specialty' => $validated['specialty'],
+				'email' => $validated['email'],
+			]);
 
 			DB::commit();
+
+			$doctor = DoctorRepository::findById($user->id);
 
 			return $this->successResponse(
 				$doctor,
@@ -94,10 +88,7 @@ class DoctorController extends Controller
 	public function show(int $id)
 	{
 		try {
-			$doctor = Doctor::has('user')->find($id);
-
-			if (!$doctor)
-				return $this->notFound('Doctor');
+			$doctor = DoctorRepository::findById($id);
 
 			return $this->successResponse($doctor);
 		} catch (\PDOException $e) {
@@ -121,12 +112,12 @@ class DoctorController extends Controller
 				'specialty', 'email',
 			]);
 
-			DB::beginTransaction();
-
-			$doctor = Doctor::has('user')->find($id);
+			$doctor = DoctorRepository::findById($id);
 
 			if (!$doctor) 
 				return $this->notFound('Doctor');
+
+			DB::beginTransaction();
 
 			if ($this->hasAttribute('name', $validated))
 				$doctor->user->name = $validated['name'];
@@ -156,6 +147,8 @@ class DoctorController extends Controller
 
 			DB::commit();
 
+			$doctor = DoctorRepository::findById($id);
+
 			return $this->successResponse($doctor);
 		} catch (\PDOException $e) {
 			DB::rollBack();
@@ -177,7 +170,7 @@ class DoctorController extends Controller
 	public function destroy(int $id)
 	{
 		try {
-			$doctor = Doctor::has('user')->find($id);
+			$doctor = DoctorRepository::findById($id);
 
 			if (!$doctor)
 				return $this->notFound('Doctor');
@@ -185,7 +178,6 @@ class DoctorController extends Controller
 			DB::beginTransaction();
 
 			$doctor->user->delete();
-
 			$doctor->push();
 
 			DB::commit();

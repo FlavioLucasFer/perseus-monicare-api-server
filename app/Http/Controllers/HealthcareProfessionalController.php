@@ -6,7 +6,7 @@ use App\Http\Requests\StoreHealthcareProfessionalRequest;
 use App\Http\Requests\UpdateHealthcareProfessionalRequest;
 use App\Models\HealthcareProfessional;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Repositories\HealthcareProfessionalRepository;
 use Illuminate\Support\Facades\DB;
 
 class HealthcareProfessionalController extends Controller
@@ -19,10 +19,7 @@ class HealthcareProfessionalController extends Controller
 	public function index()
 	{
 		try {
-			$healthcareProfessionals = HealthcareProfessional::has('user')->get();
-
-			if (!$healthcareProfessionals) 
-				return $this->notFound('Healthcare professionals');
+			$healthcareProfessionals = HealthcareProfessionalRepository::find();
 		
 			return $this->successResponse($healthcareProfessionals);
 		} catch(\PDOException $e) {
@@ -46,26 +43,23 @@ class HealthcareProfessionalController extends Controller
 
 			DB::beginTransaction();
 
-			$user = new User();
-			$healthcareProfessional = new HealthcareProfessional();
+			$user = User::create([
+				'name' => $validated['name'],
+				'login' => $validated['login'],
+				'password' => $validated['password'],
+				'cpf' => $validated['cpf'],
+				'phone' => $validated['phone'],
+				'type' => 'DC',
+			]);
 
-			$user->name = $validated['name'];
-			$user->login = $validated['login'];
-			$user->password = $validated['password'];
-			$user->cpf = $validated['cpf'];
-			$user->phone = $validated['phone'];
-			$user->type = 'HP';
-
-			$user->save();
-
-			$healthcareProfessional->id = $user->id;
-			$healthcareProfessional->email = $validated['email'];
-
-			$healthcareProfessional->save();
-
-			$healthcareProfessional->user = $user;
+			HealthcareProfessional::create([
+				'id' => $user->id,
+				'email' => $validated['email'],
+			]);
 
 			DB::commit();
+
+			$healthcareProfessional = HealthcareProfessionalRepository::findById($user->id);
 
 			return $this->successResponse(
 				$healthcareProfessional,
@@ -91,10 +85,7 @@ class HealthcareProfessionalController extends Controller
 	public function show(int $id)
 	{
 		try {
-			$healthcareProfessional = HealthcareProfessional::has('user')->find($id);
-
-			if (!$healthcareProfessional) 
-				return $this->notFound('Healthcare professional');
+			$healthcareProfessional = HealthcareProfessionalRepository::findById($id);
 
 			return $this->successResponse($healthcareProfessional);
 		} catch (\PDOException $e) {
@@ -117,8 +108,7 @@ class HealthcareProfessionalController extends Controller
 				'cpf', 'phone', 'email',
 			]);
 
-
-			$healthcareProfessional = HealthcareProfessional::has('user')->find($id);
+			$healthcareProfessional = HealthcareProfessionalRepository::findById($id);
 			
 			if (!$healthcareProfessional) 
 				return $this->notFound('Healthcare professional');
@@ -147,6 +137,8 @@ class HealthcareProfessionalController extends Controller
 
 			DB::commit();
 
+			$healthcareProfessional = HealthcareProfessionalRepository::findById($id);
+
 			return $this->successResponse($healthcareProfessional);
 		} catch(\PDOException $e) {
 			DB::rollBack();
@@ -168,15 +160,14 @@ class HealthcareProfessionalController extends Controller
 	public function destroy(int $id)
 	{
 		try {
-			$healthcareProfessional = HealthcareProfessional::has('user')->find($id);
+			$healthcareProfessional = HealthcareProfessionalRepository::findById($id);
 
-			if (!$healthcareProfessional) 
+			if (!$healthcareProfessional)
 				return $this->notFound('Healthcare professional');
 
 			DB::beginTransaction();
 
 			$healthcareProfessional->user->delete();
-
 			$healthcareProfessional->push();
 
 			DB::commit();

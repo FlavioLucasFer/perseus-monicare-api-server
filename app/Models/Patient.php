@@ -10,6 +10,12 @@ class Patient extends Model
 
 	public $timestamps = false;
 
+	protected $fillable = [
+		'id',
+		'birthDate',
+		'email',
+	];
+
 	protected $maps = [
 		'birth_date' => 'birthDate',
 	];
@@ -49,21 +55,11 @@ class Patient extends Model
 
 	public function user()
 	{
-		return $this->belongsTo(User::class, 'id', 'id');
+		return $this->hasOne(User::class, 'id', 'id');
 	}
 
-	public function toArray()
+	public function caregivers()
 	{
-		return [
-			'id' => $this->user->id,
-			'name' => $this->user->name,
-			'login' => $this->user->login,
-			'cpf' => $this->user->cpf,
-			'phone' => $this->user->phone,
-			'birthDate' => $this->getBirthDateAttribute(),
-			'email' => $this->getEmailAttribute(),
-			'createdAt' => $this->user->createdAt,
-			'updatedAt' => $this->user->updatedAt,
-		];
+		return $this->hasMany(Caregiver::class, 'patient_id', 'id');
 	}
 }

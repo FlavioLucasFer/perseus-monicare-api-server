@@ -10,6 +10,11 @@ class HealthcareProfessional extends Model
 
 	public $timestamps = false;
 
+	protected $fillable = [
+		'id',
+		'email',
+	];
+
 	public function setEmailAttribute($value) 
 	{
 		if ($value) 
@@ -18,20 +23,6 @@ class HealthcareProfessional extends Model
 
 	public function user()
 	{
-		return $this->belongsTo(User::class, 'id', 'id');
-	}
-
-	public function toArray()
-	{
-		return [
-			'id' => $this->user->id,
-			'name' => $this->user->name,
-			'login' => $this->user->login,
-			'cpf' => $this->user->cpf,
-			'phone' => $this->user->phone,
-			'email' => $this->attributes['email'],
-			'createdAt' => $this->user->createdAt,
-			'updatedAt' => $this->user->updatedAt,
-		];
+		return $this->hasOne(User::class, 'id', 'id');
 	}
 }

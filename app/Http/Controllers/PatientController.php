@@ -6,6 +6,7 @@ use App\Http\Requests\StorePatientRequest;
 use App\Http\Requests\UpdatePatientRequest;
 use App\Models\Patient;
 use App\Models\User;
+use App\Repositories\PatientRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -19,10 +20,7 @@ class PatientController extends Controller
 	public function index() : JsonResponse
 	{
 		try {
-			$patients = Patient::has('user')->get();
-
-			if (!$patients)
-			return $this->notFound('Patients');
+			$patients = PatientRepository::find();
 
 			return $this->successResponse($patients);
 		} catch (\PDOException $e) {
@@ -47,28 +45,24 @@ class PatientController extends Controller
 
 			DB::beginTransaction();
 
-			$user = new User();
-			$patient = new Patient();
+			$user = User::create([
+				'name' => $validated['name'],
+				'login' => $validated['login'],
+				'password' => $validated['password'],
+				'cpf' => $validated['cpf'],
+				'phone' => $validated['phone'],
+				'type' => 'PT',
+			]);
 
-			$user->name = $validated['name'];
-			$user->login = $validated['login'];
-			$user->password = $validated['password'];
-			$user->cpf = $validated['cpf'];
-			$user->phone = $validated['phone'];
-			$user->type = 'PT';
-
-			$user->save();
-
-			$patient->id = $user->id;
-			$patient->birthDate = $validated['birthDate'];
-
-			$patient->email = $validated['email'];
-			
-			$patient->save();
-
-			$patient->user = $user;
+			Patient::create([
+				'id' => $user->id,
+				'birthDate' => $validated['birthDate'],
+				'email' => $validated['email'],
+			]);
 
 			DB::commit();
+
+			$patient = PatientRepository::findById($user->id);
 
 			return $this->successResponse(
 				$patient,
@@ -94,10 +88,7 @@ class PatientController extends Controller
 	public function show(int $id) : JsonResponse
 	{
 		try {
-			$patient = Patient::has('user')->find($id);
-
-			if (!$patient)
-				return $this->notFound('Patient');
+			$patient = PatientRepository::findById($id);
 
 			return $this->successResponse($patient);
 		} catch (\PDOException $e) {
@@ -120,13 +111,13 @@ class PatientController extends Controller
 				'cpf', 'phone', 'birthDate',
 				'email',
 			]);
-
-			DB::beginTransaction();
-
-			$patient = Patient::has('user')->find($id);
-
+			
+			$patient = PatientRepository::findById($id);
+			
 			if (!$patient)
 				return $this->notFound('Patient');
+			
+			DB::beginTransaction();
 
 			if ($this->hasAttribute('name', $validated))
 				$patient->user->name = $validated['name'];
@@ -153,6 +144,8 @@ class PatientController extends Controller
 
 			DB::commit();
 
+			$patient = PatientRepository::findById($id);
+
 			return $this->successResponse($patient);
 		} catch (\PDOException $e) {
 			DB::rollBack();
@@ -174,7 +167,7 @@ class PatientController extends Controller
 	public function destroy(int $id) : JsonResponse
 	{
 		try {
-			$patient = Patient::has('user')->find($id);
+			$patient = PatientRepository::findById($id);
 
 			if (!$patient)
 				return $this->notFound('Patient');
@@ -182,7 +175,6 @@ class PatientController extends Controller
 			DB::beginTransaction();
 
 			$patient->user->delete();
-
 			$patient->push();
 
 			DB::commit();
