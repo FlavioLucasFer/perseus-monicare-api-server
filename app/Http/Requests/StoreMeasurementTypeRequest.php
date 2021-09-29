@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\Double;
+
 class StoreMeasurementTypeRequest extends Request
 {
 	/**
@@ -13,6 +15,11 @@ class StoreMeasurementTypeRequest extends Request
 	{
 		return [
 			'name' => 'required|string|max:100|unique:App\Models\MeasurementType',
+			'optimum' => ['required', new Double],
+			'highest' => ['required', new Double],
+			'lowest' => ['required', new Double],
+			'maxBorder' => ['required', new Double],
+			'minBorder' => ['required', new Double],
 		];
 	}
 }
