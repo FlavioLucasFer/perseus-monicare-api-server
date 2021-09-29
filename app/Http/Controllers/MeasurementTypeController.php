@@ -35,10 +35,22 @@ class MeasurementTypeController extends Controller
 	public function store(StoreMeasurementTypeRequest $request) : JsonResponse
 	{
 		try {
-			$validated = $request->safe()->only(['name']);
+			$validated = $request->safe()->only([
+				'name',
+				'optimum',
+				'highest',
+				'lowest',
+				'maxBorder',
+				'minBorder',
+			]);
 
 			$measurementType = MeasurementType::create([
 				'name' => $validated['name'],
+				'optimum' => $validated['optimum'],
+				'highest' => $validated['highest'],
+				'lowest' => $validated['lowest'],
+				'maxBorder' => $validated['maxBorder'],
+				'minBorder' => $validated['minBorder'],
 			]);
 
 			return $this->successResponse($measurementType, $this->statuses()->CREATED);
@@ -79,10 +91,32 @@ class MeasurementTypeController extends Controller
 			if (!$measurementType)
 				return $this->notFound('Measurement type');
 
-			$validated = $request->safe()->only(['name']);
+			$validated = $request->safe()->only([
+				'name',
+				'optimum',
+				'highest',
+				'lowest',
+				'maxBorder',
+				'minBorder',
+			]);
 
 			if ($this->hasAttribute('name', $validated))
 				$measurementType->name = $validated['name'];
+
+			if ($this->hasAttribute('optimum', $validated))
+				$measurementType->optimum = $validated['optimum'];
+
+			if ($this->hasAttribute('highest', $validated))
+				$measurementType->highest = $validated['highest'];
+
+			if ($this->hasAttribute('lowest', $validated))
+				$measurementType->lowest = $validated['lowest'];
+
+			if ($this->hasAttribute('maxBorder', $validated))
+				$measurementType->maxBorder = $validated['maxBorder'];
+
+			if ($this->hasAttribute('minBorder', $validated))
+				$measurementType->minBorder = $validated['minBorder'];
 
 			$measurementType->save();
 
