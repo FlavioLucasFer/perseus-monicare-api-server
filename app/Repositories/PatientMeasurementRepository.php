@@ -14,7 +14,7 @@ class PatientMeasurementRepository
 			->where('patient_measurements.patient_id', '=', $patientId)
 			->get([
 				'patient_measurements.*',
-				'patient_measurements.measured_at AS measuredAt',
+				DB::raw("DATE_FORMAT(patient_measurements.measured_at, '%d/%m/%Y %H:%i:%s') AS measuredAt"),
 				DB::raw("
 					CASE
 						WHEN patient_measurements.value > mt.highest OR patient_measurements.value < mt.lowest THEN 'bad'
@@ -32,7 +32,7 @@ class PatientMeasurementRepository
 			->where('patient_measurements.patient_id', '=', $patientId)
 			->find($id, [
 				'patient_measurements.*',
-				'patient_measurements.measured_at AS measuredAt',
+				DB::raw("DATE_FORMAT(patient_measurements.measured_at, '%d/%m/%Y %H:%i:%s') AS measuredAt"),
 				DB::raw("
 					CASE
 						WHEN patient_measurements.value > mt.highest OR patient_measurements.value < mt.lowest THEN 'bad'
