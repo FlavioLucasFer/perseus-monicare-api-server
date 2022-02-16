@@ -2,43 +2,133 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Exception;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+
+class User extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable;
+	use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var string[]
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+	use SoftDeletes;
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+	protected $table = 'users';
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+	protected $dates = ['deleted_at'];
+
+	protected $fillable = [
+		'name',
+		'login',
+		'password',
+		'cpf',
+		'phone',
+		'type',
+	];
+
+	protected $maps = [
+		'created_at' => 'createdAt',
+		'updated_at' => 'updatedAt',
+	];
+
+	protected $append = [
+		'createdAt',
+		'updatedAt',
+	];
+
+	protected $hidden = [
+		'password',
+		'remember_token',
+		'created_at',
+		'updated_at',
+		'deleted_at',
+		'id',
+	];
+
+	protected $guarded = [
+		'id',
+		'created_at',
+		'updated_at',
+		'deleted_at',
+	];
+
+	public function getCreatedAtAttribute() 
+	{
+		return $this->attributes['created_at'];
+	}
+
+	public function getUpdatedAtAttribute() 
+	{
+		return $this->attributes['updated_at'];
+	}
+
+	public function setNameAttribute($value)
+	{
+		if ($value)
+			$this->attributes['name'] = $value;
+	}
+
+	public function setLoginAttribute($value)
+	{
+		if ($value)
+			$this->attributes['login'] = $value;
+	}
+
+	public function setPasswordAttribute($value) 
+	{
+		if ($value)
+			$this->attributes['password'] = Hash::make($value);
+	}
+
+	public function setCpfAttribute($value)
+	{
+		if ($value)
+			$this->attributes['cpf'] = $value;
+	}
+
+	public function setPhoneAttribute($value)
+	{	
+		if ($value) 
+			$this->attributes['phone'] = $value;
+	}
+
+	public function setTypeAttribute($value)
+	{
+		if ($value) {
+			if (
+				$value === "AD" ||
+				$value === "PT" ||
+				$value === "DC" ||
+				$value === "CG" ||
+				$value === "HP"
+			) {
+				$this->attributes['type'] = $value;
+			}
+			else
+				throw new Exception('Invalid user type');
+		}
+	}
+
+	/**
+	 * Get the identifier that will be stored in the subject claim of the JWT.
+	 *
+	 * @return mixed
+	 */
+	public function getJWTIdentifier()
+	{
+		return $this->getKey();
+	}
+
+	/**
+	 * Return a key value array, containing any custom claims to be added to the JWT.
+	 *
+	 * @return array
+	 */
+	public function getJWTCustomClaims()
+	{
+		return [];
+	}
 }

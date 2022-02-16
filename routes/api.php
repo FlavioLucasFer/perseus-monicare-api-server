@@ -1,6 +1,12 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\CaregiverController;
+use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\HealthcareProfessionalController;
+use App\Http\Controllers\MeasurementTypeController;
+use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PatientMeasurementController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +20,37 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group([
+	'prefix' => 'auth',
+	'namespace' => 'App\Http\Controllers',
+], function () {
+	Route::post('login', 'AuthController@login');
+	Route::post('logout', 'AuthController@logout');
+	Route::post('refresh', 'AuthController@refresh');
+	Route::post('me', 'AuthController@me');
+});
+
+Route::group([
+	'middleware' => ['apiJwt'],
+], function () {
+	Route::apiResource('users', UserController::class);
+	Route::apiResource('healthcare-professionals', HealthcareProfessionalController::class, ['except' => ['store']]);
+	Route::apiResource('doctors', DoctorController::class, ['except' => ['store']]);
+	Route::apiResource('patients', PatientController::class, ['except' => ['store']]);
+	Route::apiResource('caregivers', CaregiverController::class, ['except' => ['store']]);
+	Route::apiResource('measurement-types', MeasurementTypeController::class);
+	Route::apiResource(
+		'patient-measurements/{patient_id}', 
+		PatientMeasurementController::class,
+		['parameters' => ['{patient_id}' => 'patient_measurement_id']]
+	);
+});
+
+Route::group([
+	'namespace' => 'App\Http\Controllers',
+], function () {
+	Route::post('healthcare-professionals', 'HealthcareProfessionalController@store');
+	Route::post('doctors', 'DoctorController@store');
+	Route::post('patients', 'PatientController@store');
+	Route::post('caregivers', 'CaregiverController@store');
 });

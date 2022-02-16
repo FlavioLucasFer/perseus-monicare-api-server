@@ -1,64 +1,98 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Executando a aplicação
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Antes de começar...
 
-## About Laravel
+Garanta que os seguintes softwares e serviços estejam instalados em seu computador:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [PHP](https://www.php.net/)
+- [PHP Composer](https://getcomposer.org/download/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- [MySQL Community Server](https://dev.mysql.com/downloads/mysql/)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+****
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 1 - Instalando as dependências
 
-## Learning Laravel
+Abra um terminal na raiz do projeto e execute o comando:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```
+composer install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**Talvez seja necessário atualizar o composer e/ou as dependências do arquivo composer.lock, se for o caso, execute, respectivamente, os seguintes comandos:**
 
-## Laravel Sponsors
+```
+composer self-update
+composer update
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## 2 - Criando o banco de dados
 
-### Premium Partners
+Usando uma ferramenta para gerenciar o MySQL (como o [phpMyAdmin](https://www.phpmyadmin.net/)) ou através da linha de comando, crie um banco de dados chamado *monicare* (pode ser dado o nome que quiser para o banco de dados, mas recomendamos usar o nome da aplicação).
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[CMS Max](https://www.cmsmax.com/)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
+## 3 - Configurando o ambiente de desenvolvimento
 
-## Contributing
+Note que há um arquivo na raiz do projeto chamado *.env.example*, duplique este arquivo e renomeie a cópia para *.env* apenas.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Agora altere os valores das variáveis *DB_PORT*, *DB_DATABASE*, *DB_USERNAME* e *DB_PASSWORD* conforme necessário. **Note que elas já possuem alguns valores que podem coincidir com as configurações da sua máquina, nesse caso, não precisará alterar**.
 
-## Code of Conduct
+## 4 - Rodando as migrations
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Antes de rodar as migrations, garanta que seu serviço do MySQL esteja rodando e garanta que o arquivo *.env* esteja devidamente configurado. 
 
-## Security Vulnerabilities
+Então, com um terminal aberto na raiz do projeto, execute o comando a seguir para rodar as migrations:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+php artisan migrate
+```
 
-## License
+## 5 - Gerando a key para autenticação JWT
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+A biblioteca resposável por gerar e gerenciar os tokens JWT de autenticação da aplicação necessita que uma key seja gerada.
+
+Para gerar esta key, execute os seguintes comandos, respectivamente:
+
+```
+php artisan key:generate
+php artisan jwt:secret
+```
+
+## 6 - Iniciando o servidor
+
+Agora que tudo está devidamente configurado, execute o comando abaixo para iniciar o servidor:
+
+```
+php artisan serve
+```
+
+E pronto, a API está rodando.
+
+****
+
+## Informações extras
+
+****
+
+## Proteção das rotas
+
+Atualmente o único middleware de proteção das rotas é o middleware de autenticação, então, para que consiga fazer requisições primeiramente terá que efetuar login através da rota ```/auth/login``` do tipo *post*.
+
+**Mas eu não tenho um usuário, o que faço?** As únicas rotas que não possuem proteção de autenticação, além da rota de login, são as rotas para cadastrar usuário, todas elas do tipo *post*. 
+
+O sistema possui 4 tipos de usuários: doctor (*médico*), healthcare professional (*profissional de saúde*), patient (*paciente*) e caregiver (*cuidador*). 
+
+Sendo assim, para fazer requisições a qualquer rota basta criar um usuário de qualquer um dos tipos mencionados acima e então efetuar login.
+
+## Tempo de duração do token JWT
+
+Os tokens JWT de autenticação duram 1 hora. Caso tenha feito login e o token expire, não precisa efetuar login novamente, basta atualizar o token através da rota ```/auth/refresh``` do tipo *post*.
+
+## Postman Collection e Environment
+
+Caso utilize o Postman, você pode baixar uma *collection* com todas as rotas clicando [aqui](https://drive.google.com/file/d/10Q5Ij8erS4SajcdmbR-PFEPkbAYqp5zl/view?usp=sharing) e baixar um *environment* já configurado clicando [aqui](https://drive.google.com/file/d/1K5bNzhE9chCH1F_XOpaev1pMSbz9WJld/view?usp=sharing).
+
+****
+
+## Não conseguiu iniciar a aplicação?
+
+Caso tenha seguido o passo a passo corretamente e mesmo assim não tenha conseguido iniciar a aplicação, abra um *issue* no repositório que iremos ajudá-lo. 
