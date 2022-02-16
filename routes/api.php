@@ -34,14 +34,23 @@ Route::group([
 	'middleware' => ['apiJwt'],
 ], function () {
 	Route::apiResource('users', UserController::class);
-	Route::apiResource('healthcare-professionals', HealthcareProfessionalController::class);
-	Route::apiResource('doctors', DoctorController::class);
-	Route::apiResource('patients', PatientController::class);
-	Route::apiResource('caregivers', CaregiverController::class);
+	Route::apiResource('healthcare-professionals', HealthcareProfessionalController::class, ['except' => ['store']]);
+	Route::apiResource('doctors', DoctorController::class, ['except' => ['store']]);
+	Route::apiResource('patients', PatientController::class, ['except' => ['store']]);
+	Route::apiResource('caregivers', CaregiverController::class, ['except' => ['store']]);
 	Route::apiResource('measurement-types', MeasurementTypeController::class);
 	Route::apiResource(
 		'patient-measurements/{patient_id}', 
 		PatientMeasurementController::class,
 		['parameters' => ['{patient_id}' => 'patient_measurement_id']]
 	);
+});
+
+Route::group([
+	'namespace' => 'App\Http\Controllers',
+], function () {
+	Route::post('healthcare-professionals', 'HealthcareProfessionalController@store');
+	Route::post('doctors', 'DoctorController@store');
+	Route::post('patients', 'PatientController@store');
+	Route::post('caregivers', 'CaregiverController@store');
 });
